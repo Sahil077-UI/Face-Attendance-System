@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Live Attendance</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<nav>
+
+    <h2>Face Attendance</h2>
+
+    <div>
+
+        <a href="/">Dashboard</a>
+
+        <a href="/students">Students</a>
+
+    </div>
+
+</nav>
+
+
+<main>
+
+    <h1>Live Attendance</h1>
+
+
+    <div class="camera-container">
+
+        <img
+            src="{{ url_for('video_feed') }}"
+            class="camera"
+        >
+
+    </div>
+
+
+    <p class="camera-status">
+
+        Camera is running — scan your face
+
+    </p>
+
+
+    <!-- STOP CAMERA BUTTON -->
+
+    <a
+        href="/stop_camera"
+        class="stop-button"
+    >
+
+        ⏹ Stop Camera & Go to Dashboard
+
+    </a>
+
+
+</main>
+
+
+</body>
+
+</html>

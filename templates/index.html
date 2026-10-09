@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Face Attendance System</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <!-- Auto refresh dashboard every 5 seconds -->
+    <meta http-equiv="refresh" content="5">
+
+</head>
+
+
+<body>
+
+
+<nav>
+
+    <h2>Face Attendance</h2>
+
+    <div>
+
+        <a href="/">Dashboard</a>
+
+        <a href="/attendance">Live Attendance</a>
+
+        <a href="/students">Students</a>
+
+    </div>
+
+</nav>
+
+
+<main>
+
+
+    <h1>Dashboard</h1>
+
+
+    <!-- ================================= -->
+    <!-- STATISTICS -->
+    <!-- ================================= -->
+
+    <div class="cards">
+
+
+        <div class="card">
+
+            <h3>Total Students</h3>
+
+            <p>
+                {{ total_students }}
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Present Today</h3>
+
+            <p>
+                {{ present_today }}
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- START ATTENDANCE -->
+    <!-- ================================= -->
+
+    <div class="actions">
+
+        <a href="/attendance">
+
+            Start Live Attendance
+
+        </a>
+
+        <a href="/register" class="register-button">
+            Register Student
+        </a>
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- TODAY'S ATTENDANCE -->
+    <!-- ================================= -->
+
+    <div class="attendance-section">
+
+
+        <div class="section-header">
+
+            <h2>
+                Today's Attendance
+            </h2>
+
+            <span>
+                {{ present_today }} Present
+            </span>
+
+        </div>
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>Student ID</th>
+
+                    <th>Name</th>
+
+                    <th>IN Time</th>
+
+                    <th>OUT Time</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                {% for record in attendance_today %}
+
+
+                <tr>
+
+
+                    <td>
+
+                        {{ record.student_id }}
+
+                    </td>
+
+
+                    <td>
+
+                        <strong>
+                            {{ record.name }}
+                        </strong>
+
+                    </td>
+
+
+                    <td>
+
+                        {% if record.in_time %}
+
+                            {{ record.in_time }}
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if record.out_time %}
+
+                            {{ record.out_time }}
+
+                        {% else %}
+
+                            <span class="not-out">
+
+                                Not checked out
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if record.out_time %}
+
+                            <span class="status completed">
+
+                                Completed
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="status present">
+
+                                Present
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                </tr>
+
+
+                {% else %}
+
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="no-data"
+                    >
+
+                        No attendance recorded today.
+
+                    </td>
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+</main>
+
+
+</body>
+
+</html>

@@ -1,0 +1,228 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Students - Face Attendance</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+<!-- ============================= -->
+<!-- NAVIGATION -->
+<!-- ============================= -->
+
+<nav>
+
+    <h2>Face Attendance</h2>
+
+    <div>
+
+        <a href="/">
+            Dashboard
+        </a>
+
+        <a href="/attendance">
+            Live Attendance
+        </a>
+
+        <a href="/students">
+            Students
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ============================= -->
+<!-- MAIN CONTENT -->
+<!-- ============================= -->
+
+<main>
+
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Registered Students</h1>
+
+            <a
+                href="/register"
+                class="register-button"
+            >
+                Register Student
+            </a>
+
+            <p>
+                Students registered in the face recognition system
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <span class="student-count">
+
+                {{ students|length }} Students
+
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- STUDENTS TABLE -->
+    <!-- ============================= -->
+
+    <div class="table-container">
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>#</th>
+
+                    <th>Student ID</th>
+
+                    <th>Name</th>
+
+                    <th>Registration Date</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                {% for student in students %}
+
+
+                <tr>
+
+
+                    <td>
+
+                        {{ loop.index }}
+
+                    </td>
+
+
+                    <td>
+
+                        <strong>
+
+                            {{ student.student_id }}
+
+                        </strong>
+
+                    </td>
+
+
+                    <td>
+
+                        {{ student.name }}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if student.created_at %}
+
+                            {{ student.created_at }}
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="student-status">
+
+                            Active
+
+                        </span>
+
+                    </td>
+
+
+                </tr>
+
+
+                {% else %}
+
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="no-data"
+                    >
+
+                        <div>
+
+                            <h3>
+                                No Students Registered
+                            </h3>
+
+                            <p>
+                                Register a student to see them here.
+                            </p>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+    </div>
+
+
+</main>
+
+
+</body>
+
+</html>
+```

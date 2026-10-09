@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Register Student</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<nav>
+
+    <h2>Face Attendance</h2>
+
+    <div>
+
+        <a href="/">Dashboard</a>
+
+        <a href="/attendance">Live Attendance</a>
+
+        <a href="/students">Students</a>
+
+    </div>
+
+</nav>
+
+
+<main>
+
+    <h1>Register New Student</h1>
+
+    <p>
+        Enter student details and capture 5 face samples.
+    </p>
+
+
+    <!-- Student information -->
+
+    <div>
+
+        <label>
+            Student Name
+        </label>
+
+        <input
+            type="text"
+            id="studentName"
+            placeholder="Enter student name"
+        >
+
+    </div>
+
+
+    <br>
+
+
+    <div>
+
+        <label>
+            Student ID
+        </label>
+
+        <input
+            type="text"
+            id="studentId"
+            placeholder="Enter student ID"
+        >
+
+    </div>
+
+
+    <br>
+
+
+    <!-- Camera -->
+
+    <div class="camera-container">
+
+        <video
+            id="video"
+            autoplay
+            playsinline
+            class="camera"
+        ></video>
+
+        <canvas
+            id="canvas"
+            style="display:none;"
+        ></canvas>
+
+    </div>
+
+
+    <br>
+
+
+    <!-- Sample counter -->
+
+    <h3 id="sampleCounter">
+
+        Samples: 0 / 5
+
+    </h3>
+
+
+    <p id="message"></p>
+
+
+    <!-- Buttons -->
+
+    <button
+        id="startCamera"
+        onclick="startCamera()"
+    >
+
+        Start Camera
+
+    </button>
+
+
+    <button
+        id="captureButton"
+        onclick="captureSample()"
+        disabled
+    >
+
+        Capture Face
+
+    </button>
+
+
+    <button
+        id="registerButton"
+        onclick="registerStudent()"
+        disabled
+    >
+
+        Register Student
+
+    </button>
+
+
+    <br><br>
+
+
+    <a href="/">
+        Cancel
+    </a>
+
+
+</main>
+
+
+<script>
+
+let video = document.getElementById("video");
+
+let canvas = document.getElementById("canvas");
+
+let captureButton =
+    document.getElementById("captureButton");
+
+let registerButton =
+    document.getElementById("registerButton");
+
+let message =
+    document.getElementById("message");
+
+let sampleCounter =
+    document.getElementById("sampleCounter");
+
+
+let stream = null;
+
+let samples = [];
+
+
+const MAX_SAMPLES = 5;
+
+
+// ========================================
+// START CAMERA
+// ========================================
+
+async function startCamera() {
+
+    try {
+
+        stream = await navigator.mediaDevices.getUserMedia({
+
+            video: true,
+
+            audio: false
+
+        });
+
+
+        video.srcObject = stream;
+
+        captureButton.disabled = false;
+
+        message.innerText =
+            "Camera started. Position your face and capture 5 samples.";
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        message.innerText =
+            "Unable to access camera. Please allow camera permission.";
+
+    }
+
+}
+
+
+// ========================================
+// CAPTURE SAMPLE
+// ========================================
+
+function captureSample() {
+
+    if (samples.length >= MAX_SAMPLES) {
+
+        return;
+
+    }
+
+
+    const context =
+        canvas.getContext("2d");
+
+
+    canvas.width =
+        video.videoWidth;
+
+    canvas.height =
+        video.videoHeight;
+
+
+    context.drawImage(
+
+        video,
+
+        0,
+
+        0,
+
+        canvas.width,
+
+        canvas.height
+
+    );
+
+
+    const imageData =
+        canvas.toDataURL("image/jpeg", 0.9);
+
+
+    samples.push(imageData);
+
+
+    sampleCounter.innerText =
+        `Samples: ${samples.length} / ${MAX_SAMPLES}`;
+
+
+    message.innerText =
+        `Face sample ${samples.length} captured.`;
+
+
+    if (samples.length === MAX_SAMPLES) {
+
+        captureButton.disabled = true;
+
+        registerButton.disabled = false;
+
+        message.innerText =
+            "5 samples captured. Click Register Student.";
+
+    }
+
+}
+
+
+// ========================================
+// REGISTER STUDENT
+// ========================================
+
+async function registerStudent() {
+
+    const name =
+        document.getElementById("studentName").value.trim();
+
+    const studentId =
+        document.getElementById("studentId").value.trim();
+
+
+    if (!name || !studentId) {
+
+        message.innerText =
+            "Please enter name and student ID.";
+
+        return;
+
+    }
+
+
+    if (samples.length !== MAX_SAMPLES) {
+
+        message.innerText =
+            "Please capture all 5 samples.";
+
+        return;
+
+    }
+
+
+    registerButton.disabled = true;
+
+    message.innerText =
+        "Processing face samples. Please wait...";
+
+
+    try {
+
+        const response = await fetch(
+            "/register_student",
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    name: name,
+
+                    student_id: studentId,
+
+                    samples: samples
+
+                })
+
+            }
+        );
+
+
+        const result =
+            await response.json();
+
+
+        if (result.success) {
+
+            message.innerText =
+                "Student registered successfully!";
+
+
+            // Stop camera
+
+            if (stream) {
+
+                stream
+                    .getTracks()
+                    .forEach(
+                        track => track.stop()
+                    );
+
+            }
+
+
+            setTimeout(
+                function() {
+
+                    window.location.href =
+                        "/students";
+
+                },
+
+                1500
+            );
+
+        }
+
+        else {
+
+            message.innerText =
+                result.message;
+
+            registerButton.disabled = false;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        message.innerText =
+            "Registration failed.";
+
+        registerButton.disabled = false;
+
+    }
+
+}
+
+</script>
+
+
+</body>
+
+</html>
